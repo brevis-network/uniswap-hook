@@ -41,8 +41,8 @@ contract VipHook is BaseHook, VipDiscountMap, BrevisApp, Ownable {
     }
 
     // called by proxy to properly set storage of proxy contract
-    function init(uint24 _origFee, address _brevisRequest, bytes32 _vkHash) external {
-        initOwner(); // will fail if not called via delegateCall b/c owner is set in Ownable constructor
+    function init(address owner, uint24 _origFee, address _brevisRequest, bytes32 _vkHash) external {
+        initOwner(owner); // will fail if not called via delegateCall b/c owner is set in Ownable constructor
         // no need to emit event as it's first set in proxy state
         _setBrevisRequest(_brevisRequest);
         origFee = _origFee;
