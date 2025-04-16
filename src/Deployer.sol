@@ -10,7 +10,7 @@ contract Deployer {
     uint160 constant ALL_HOOK_MASK = uint160((1 << 14) - 1);
     uint256 constant MAX_LOOP = 1e18;
     // emit when new proxy is deployed
-    event Deployed(address indexed addr);
+    event Deployed(address indexed addr, uint256 indexed salt);
 
     // start from startSalt, loop until find a valid salt
     function find(uint256 startSalt, uint160 flags, address logic, address admin, bytes memory data)
@@ -34,9 +34,10 @@ contract Deployer {
     }
 
     // deploy proxy and emit address
-    function deploy(uint256 salt, address logic, address admin, bytes memory data) external {
+    function deploy(uint256 salt, address logic, address admin, bytes memory data) external returns (address) {
         TransparentUpgradeableProxy proxy = new TransparentUpgradeableProxy{salt: bytes32(salt)}(logic, admin, data);
-        emit Deployed(address(proxy));
+        emit Deployed(address(proxy), salt);
+        return address(proxy);
     }
 
     function computeAddress(address deployer, uint256 salt, bytes memory creationCodeWithArgs)
