@@ -16,7 +16,7 @@ contract Deployer {
     function find(uint256 startSalt, uint160 flags, address logic, address admin, bytes memory data)
         public
         view
-        returns (address, bytes32)
+        returns (address, uint256)
     {
         flags = flags & ALL_HOOK_MASK; // mask for only the bottom 14 bits
         bytes memory creationCodeWithArgs =
@@ -27,7 +27,7 @@ contract Deployer {
 
             // if the hook's bottom 14 bits match the desired flags AND the address does not have bytecode, we found a match
             if (uint160(hookAddress) & ALL_HOOK_MASK == flags && hookAddress.code.length == 0) {
-                return (hookAddress, bytes32(salt));
+                return (hookAddress, salt);
             }
         }
         revert("HookMiner: could not find salt");
