@@ -4,9 +4,17 @@ out = "out"
 libs = ["lib"]
 via_ir = true
 
+optimizer = true
+optimizer_runs = 200
 # fix forge bug which auto remaps to lib/v4-core/src
 remappings = [
     "v4-core/=lib/v4-core/",
 ]
 
+fs_permissions = [
+    { access = "read", path = "./script/config" },
+]
+
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
+[etherscan]
+sepolia = { key = "K26KZ6WB4CYCVNHMEFFWWT9YG23DCIGW15" }

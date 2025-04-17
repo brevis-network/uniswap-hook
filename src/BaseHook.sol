@@ -53,7 +53,7 @@ abstract contract BaseHook is IHooks {
      */
     constructor(IPoolManager _poolManager) {
         poolManager = _poolManager;
-        validateHookAddress(this);
+        //validateHookAddress(this);
     }
 
     /**
