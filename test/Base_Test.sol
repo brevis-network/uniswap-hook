@@ -181,6 +181,10 @@ abstract contract Base_Test is PosmTestSetup, MainUtils {
         poolId = poolKey.toId();
         manager.initialize(poolKey, SQRT_PRICE_1_1);
 
+        // Set POL share to enable protocol fees (20% of swap fees go to protocol)
+        vm.prank(owner);
+        policyManager.setPoolPOLShare(poolId, 200_000); // 20% in PPM (parts per million)
+
         // Fund user accounts using the helper from PosmTestSetup
         seedBalance(user1);
         seedBalance(user2);
