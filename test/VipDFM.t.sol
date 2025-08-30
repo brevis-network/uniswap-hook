@@ -5,8 +5,8 @@ import "forge-std/Test.sol";
 import "forge-std/console2.sol";
 import "forge-std/StdStorage.sol";
 
-// Import our VipDFMHook contract with Brevis integration
-import {VipDFMHook} from "../src/VipDFMHook.sol";
+// Import our VipHook contract with Brevis integration
+import {VipHook} from "../src/VipHook.sol";
 
 // Import V4 dependencies
 import {IPoolManager} from "v4-core/src/interfaces/IPoolManager.sol";

@@ -4,7 +4,7 @@ pragma solidity ^0.8.25;
 import "forge-std/Test.sol";
 import "forge-std/console2.sol";
 
-import {VipDFMHook} from "src/VipDFMHook.sol";
+import {VipHook} from "src/VipHook.sol";
 import {PoolKey} from "v4-core/src/types/PoolKey.sol";
 import {SwapParams} from "v4-core/src/types/PoolOperation.sol";
 import {TickMath} from "v4-core/src/libraries/TickMath.sol";
@@ -54,7 +54,7 @@ contract ManualVipDiscountTest is Base_Test {
             // write probe
             vm.store(hook, key, bytes32(uint256(probeValue)));
             // check via getter
-            uint16 got = VipDFMHook(hook).feeDiscount(user);
+            uint16 got = VipHook(hook).feeDiscount(user);
             if (got == probeValue) {
                 return cand;
             }

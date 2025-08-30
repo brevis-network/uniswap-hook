@@ -39,7 +39,7 @@ import {MockERC20} from "solmate/src/test/utils/mocks/MockERC20.sol";
 
 // Import project contracts
 
-import {VipDFMHook} from "src/VipDFMHook.sol";
+import {VipHook} from "src/VipHook.sol";
 import {FullRangeLiquidityManager} from "aegis-dfm/FullRangeLiquidityManager.sol";
 import {PoolPolicyManager} from "aegis-dfm/PoolPolicyManager.sol";
 import {TruncGeoOracleMulti} from "aegis-dfm/TruncGeoOracleMulti.sol";
@@ -77,7 +77,7 @@ abstract contract Base_Test is PosmTestSetup, MainUtils {
     TruncGeoOracleMulti oracle;
     DynamicFeeManager feeManager;
     FullRangeLiquidityManager liquidityManager;
-    VipDFMHook vipHook;
+    VipHook vipHook;
 
     // Brevis integration
     address brevisRequest = makeAddr("brevisRequest");
@@ -107,7 +107,7 @@ abstract contract Base_Test is PosmTestSetup, MainUtils {
         uint256 currentNonce = vm.getNonce(owner);
         uint256 adjustedNonce = currentNonce + 18; // Account for the 18 contracts from PosmTestSetup
 
-        // Define the permissions for VipDFMHook (same as Spot)
+        // Define the permissions for VipHook (same as Spot)
         uint160 vipHookFlags = permissionsToFlags(
             Hooks.Permissions({
                 beforeInitialize: false,
@@ -127,7 +127,7 @@ abstract contract Base_Test is PosmTestSetup, MainUtils {
             })
         );
 
-        // Predict addresses for dependencies to construct VipDFMHook creation code for mining
+        // Predict addresses for dependencies to construct VipHook creation code for mining
         uint256 nonceOwnerBefore = vm.getNonce(owner);
         address predictedOracle = vm.computeCreateAddress(owner, nonceOwnerBefore);
         address predictedFeeManager = vm.computeCreateAddress(owner, nonceOwnerBefore + 1);
@@ -137,7 +137,7 @@ abstract contract Base_Test is PosmTestSetup, MainUtils {
         (address minedHookAddress, bytes32 salt) = HookMiner.find(
             owner,
             vipHookFlags,
-            type(VipDFMHook).creationCode,
+            type(VipHook).creationCode,
             abi.encode(
                 manager,
                 predictedLiquidityManager,
@@ -159,17 +159,17 @@ abstract contract Base_Test is PosmTestSetup, MainUtils {
             minedHookAddress
         );
 
-        // Now deploy the VipDFMHook at the mined address using CREATE2 with the same constructor args
-        vipHook = new VipDFMHook{salt: salt}(manager, liquidityManager, policyManager, oracle, feeManager, brevisRequest);
+        // Now deploy the VipHook at the mined address using CREATE2 with the same constructor args
+        vipHook = new VipHook{salt: salt}(manager, liquidityManager, policyManager, oracle, feeManager, brevisRequest);
         vm.stopPrank();
 
         // No init call; constructor already set owner and brevis request
 
-        // Set the authorized hook in policy manager so VipDFMHook can call initializeBaseFeeBounds
+        // Set the authorized hook in policy manager so VipHook can call initializeBaseFeeBounds
         vm.prank(owner);
         policyManager.setAuthorizedHook(address(vipHook));
 
-        // Initialize the pool with the VipDFMHook
+        // Initialize the pool with the VipHook
         poolKey = PoolKey(
             currency0,
             currency1,
