@@ -1,0 +1,17 @@
+{
+  "lib/AEGIS_DFM": {
+    "rev": "a04f9ec7e2437fb58db9b698e4f0ab6bfc2499bf"
+  },
+  "lib/forge-std": {
+    "rev": "3b20d60d14b343ee4f908cb8079495c07f5e8981"
+  },
+  "lib/openzeppelin-contracts": {
+    "branch": {
+      "name": "release-v4.7",
+      "rev": "b438cb695a1ac520cee6678610b161b1d5df4d9c"
+    }
+  },
+  "lib/v4-core": {
+    "rev": "e50237c43811bd9b526eff40f26772152a42daba"
+  }
+}
