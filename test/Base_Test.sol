@@ -21,9 +21,9 @@ import {StateLibrary} from "v4-core/src/libraries/StateLibrary.sol";
 
 // - - - v4 periphery src deps - - -
 
-import {PositionManager} from "v4-periphery/PositionManager.sol";
-import {V4Quoter} from "v4-periphery/lens/V4Quoter.sol";
-import {PositionDescriptor} from "v4-periphery/PositionDescriptor.sol";
+import {PositionManager} from "v4-periphery/src/PositionManager.sol";
+import {V4Quoter} from "v4-periphery/src/lens/V4Quoter.sol";
+import {PositionDescriptor} from "v4-periphery/src/PositionDescriptor.sol";
 
 import {Deploy, IV4Quoter} from "../lib/v4-periphery/test/shared/Deploy.sol";
 
@@ -31,7 +31,7 @@ import {Deploy, IV4Quoter} from "../lib/v4-periphery/test/shared/Deploy.sol";
 
 import {PosmTestSetup} from "../lib/v4-periphery/test/shared/PosmTestSetup.sol";
 import {PositionConfig} from "../lib/v4-periphery/test/shared/PositionConfig.sol";
-import {HookMiner} from "v4-periphery/utils/HookMiner.sol";
+import {HookMiner} from "v4-periphery/src/utils/HookMiner.sol";
 
 // - - - solmate - - -
 

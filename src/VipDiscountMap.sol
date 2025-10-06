@@ -14,7 +14,7 @@ abstract contract VipDiscountMap {
     uint32 public epoch;
 
     // could be public if there is need
-    mapping(address => uint16) feeDiscount;
+    mapping(address => uint16) public feeDiscount;
 
     // decode and set multiple users, data is packed as epoch| [address|discount]
     function updateBatch(bytes calldata raw) internal {
