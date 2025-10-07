@@ -116,8 +116,8 @@ contract VipHook is Spot, VipDiscountMap, BrevisApp, Ownable {
             Currency feeCurrency = params.zeroForOne ? key.currency0 : key.currency1;
 
             // Calculate hook fee amount using discounted fee
-            uint256 swapFeeAmount = FullMath.mulDiv(absAmount, discountedFee, 1e6);
-            uint256 hookFeeAmount = FullMath.mulDiv(swapFeeAmount, protocolFeePPM, 1e6);
+            uint256 swapFeeAmount = FullMath.mulDivRoundingUp(absAmount, discountedFee, 1e6);
+            uint256 hookFeeAmount = FullMath.mulDivRoundingUp(swapFeeAmount, protocolFeePPM, 1e6);
 
             if (hookFeeAmount > 0) {
                 // Mint fee to FRLM
