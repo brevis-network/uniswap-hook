@@ -9,8 +9,6 @@ abstract contract VipDiscountMap {
     event FeeDiscountUpdated(address indexed usr, uint16 indexed discount);
     uint16 public constant MAX_DISCOUNT = 10000;
 
-    // default fee. 10% is 100_000; max is 100% 1_000_000
-    uint24 public origFee;
     uint32 public epoch;
 
     // could be public if there is need
@@ -40,13 +38,4 @@ abstract contract VipDiscountMap {
         }
     }
 
-    // if no dicount or zero discount, return fee, otherwise compute new fee
-    function getFee(address usr) public view returns (uint24) {
-        if (feeDiscount[usr] == 0) {
-            return origFee;
-        }
-        // could use unchecked to save gas
-        uint256 fee = uint256(origFee)*(MAX_DISCOUNT-feeDiscount[usr]); // larger uint avoid overflow, u64 is enough
-        return uint24(fee/MAX_DISCOUNT);
-    }
 }

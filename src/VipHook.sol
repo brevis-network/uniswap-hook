@@ -30,7 +30,7 @@ import {PoolPolicyManager} from "aegis-dfm/PoolPolicyManager.sol";
 import {TruncGeoOracleMulti} from "aegis-dfm/TruncGeoOracleMulti.sol";
 import {IDynamicFeeManager} from "aegis-dfm/interfaces/IDynamicFeeManager.sol";
 
-contract VipHook is Spot, VipDiscountMap, BrevisApp, Ownable {
+contract VipHook is VipDiscountMap, BrevisApp, Ownable, Spot {
     using PoolIdLibrary for PoolKey;
     using PoolIdLibrary for PoolId;
     using CurrencyLibrary for Currency;
@@ -116,8 +116,8 @@ contract VipHook is Spot, VipDiscountMap, BrevisApp, Ownable {
             Currency feeCurrency = params.zeroForOne ? key.currency0 : key.currency1;
 
             // Calculate hook fee amount using discounted fee
-            uint256 swapFeeAmount = FullMath.mulDiv(absAmount, discountedFee, 1e6);
-            uint256 hookFeeAmount = FullMath.mulDiv(swapFeeAmount, protocolFeePPM, 1e6);
+            uint256 swapFeeAmount = FullMath.mulDivRoundingUp(absAmount, discountedFee, 1e6);
+            uint256 hookFeeAmount = FullMath.mulDivRoundingUp(swapFeeAmount, protocolFeePPM, 1e6);
 
             if (hookFeeAmount > 0) {
                 // Mint fee to FRLM
@@ -276,6 +276,31 @@ contract VipHook is Spot, VipDiscountMap, BrevisApp, Ownable {
     // }
 
     // - - - Brevis Integration - - -
+
+    /// @notice Get the fee that would be charged to a specific user in a pool (with discount applied)
+    /// @param user The user address to check the fee for
+    /// @param poolId The pool ID to get the fee from
+    /// @return The fee in parts per million (ppm) that the user would be charged
+    function getFee(address user, PoolId poolId) public view returns (uint24) {
+        // First check if a manual fee is set for this pool
+        (uint24 manualFee, bool hasManualFee) = policyManager.getManualFee(poolId);
+
+        uint24 fee;
+
+        if (hasManualFee) {
+            // Use the manual fee if set
+            fee = manualFee;
+        } else {
+            // Otherwise get dynamic fee from fee manager
+            (uint256 baseRaw, uint256 surgeRaw) = dynamicFeeManager.getFeeState(poolId);
+            uint24 base = uint24(baseRaw);
+            uint24 surge = uint24(surgeRaw);
+            fee = base + surge; // ppm (1e-6)
+        }
+
+        // Apply Brevis discount to the dynamic fee for this user
+        return _applyBrevisDiscount(fee, user);
+    }
 
     function _applyBrevisDiscount(uint24 baseFee, address user) internal view returns (uint24) {
         uint16 discount = feeDiscount[user];

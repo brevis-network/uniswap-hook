@@ -33,7 +33,7 @@ Hierarchy:
 VipHook implements the Brevis-specific logic by inheriting `VipDiscountMap` (handles the `feeDiscount` mapping and discount math), `BrevisApp` (proof verification callbacks), and `Ownable` (admin control). The inheritance is carefully ordered to preserve the original storage layout of the Brevis hook:
 
 ```solidity
-contract VipHook is VipDiscountMap, BrevisApp, Spot, Ownable { /* ... */ }
+contract VipHook is VipDiscountMap, BrevisApp, Ownable, Spot { /* ... */ }
 ```
 
 By listing `VipDiscountMap` and `BrevisApp` before `Spot`, storage slots align with the old `VipHook`. In this order:
@@ -41,6 +41,7 @@ By listing `VipDiscountMap` and `BrevisApp` before `Spot`, storage slots align w
 - Brevis’s `feeDiscount` mapping remains in the same slot as before (slot 0)
 - `BrevisApp`’s `brevisRequest` address and challenge window remain in the next slot
 - AEGIS’s `Spot` state follows
+- Ownable next
 - `Spot` introduces a `reinvestmentPaused` boolean; in this layout it occupies previously unused padding space in an existing slot, so no existing variables are shifted
 
 Critical variables like the discount mapping, the Brevis request contract address, the stored base fee (`origFee`), and the verifying keys map (`vkMap`) remain at their original storage slots and offsets, preserving proxy storage compatibility and upgrade safety.
