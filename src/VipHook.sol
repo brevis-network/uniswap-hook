@@ -181,8 +181,12 @@ contract VipHook is VipDiscountMap, BrevisApp, Ownable, Spot {
         if (discount == 0) {
             return baseFee;
         }
-        uint256 discountedFee = uint256(baseFee) * (MAX_DISCOUNT - discount);
-        return uint24(discountedFee / MAX_DISCOUNT);
+
+        // Round towards the protocol so discounts never exceed the intended amount
+        uint256 discountedFee = FullMath.mulDivRoundingUp(
+            uint256(baseFee), MAX_DISCOUNT - discount, MAX_DISCOUNT
+        );
+        return uint24(discountedFee);
     }
 
     function handleProofResult(bytes32 _vkHash, bytes calldata _appCircuitOutput) internal override {
