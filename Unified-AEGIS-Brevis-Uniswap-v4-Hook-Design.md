@@ -73,9 +73,9 @@ Uniswap v4 requires the hook contract’s address to encode its callback permiss
 |----------------------------------|----------------|------------|-----------------|
 | beforeInitialize                 | False          | False      | False           |
 | afterInitialize                  | True           | True       | True            |
-| beforeAddLiquidity               | False          | False      | False           |
+| beforeAddLiquidity               | False          | True       | True            |
 | afterAddLiquidity                | False          | False      | False           |
-| beforeRemoveLiquidity            | False          | False      | False           |
+| beforeRemoveLiquidity            | False          | True       | True            |
 | afterRemoveLiquidity             | False          | False      | False           |
 | beforeSwap                       | True           | True       | True            |
 | afterSwap                        | False          | True       | True            |
@@ -86,9 +86,10 @@ Uniswap v4 requires the hook contract’s address to encode its callback permiss
 | afterAddLiquidityReturnDelta     | False          | False      | False           |
 | afterRemoveLiquidityReturnDelta  | False          | False      | False           |
 
-Unified permission mask: set `afterInitialize`, `beforeSwap`, `afterSwap`, `beforeSwapReturnDelta`, `afterSwapReturnDelta` to 1. The combined 14-bit mask is `0xCC2` (hex) = `1100 1100 0010` (binary) = `3266` (decimal).
+Unified permission mask: set `afterInitialize`, `beforeAddLiquidity`, `beforeRemoveLiquidity`, `beforeSwap`, `afterSwap`, `beforeSwapReturnDelta`, `afterSwapReturnDelta` to 1. The combined 14-bit mask is `0x1ACC` (hex) = `0001 1010 1100 1100` (binary) = `6860` (decimal).
 
-The deterministic deployment script must target this flags value when mining the CREATE2 salt so the proxy’s address encodes these bits. With the correct suffix, the `PoolManager` will invoke all required callbacks.
+
+Uniswap reserves the upper two bits of the 16-bit suffix for hook-address signalling, so production deployments (including the existing AEGIS Spot hook) land on addresses ending in `0xDACC`. Masking off the reserved `0xC000` still yields the required 14-bit permissions value `0x1ACC`, which is what `Hooks.validateHookPermissions` checks.
 
 Rationale: This expanded set ensures post-swap processing and return-delta swap callbacks are available (needed for reinvestment and exact-in fee collection). Upgrading an old Brevis hook in place without changing address bits will not activate new callbacks; deploy a new hook address for full functionality.
 
@@ -156,12 +157,12 @@ Security: `onlyPoolManager` restricts Uniswap callbacks, `onlyBrevisRequest` res
 - Extend `Spot` in addition to Brevis modules; preserve base-class order for storage:
 
   ```solidity
-  contract VipHook is VipDiscountMap, BrevisApp, Spot, Ownable { /* ... */ }
+  contract VipHook is VipDiscountMap, BrevisApp, Ownable, Spot, { /* ... */ }
   ```
 
 - Remove direct `BaseHook` inheritance (covered by `Spot`)
 - Constructor accepts: `IPoolManager`, `IFullRangeLiquidityManager`, `PoolPolicyManager`, `ITruncGeoOracleMulti`, `IDynamicFeeManager`; forward to `Spot` constructor
-- `getHookPermissions()`: return the combined mask enabling `afterInitialize`, `beforeSwap`, `afterSwap`, `beforeSwapReturnDelta`, `afterSwapReturnDelta`
+- `getHookPermissions()`: return the combined mask enabling `afterInitialize`, `beforeAddLiquidity`, `beforeRemoveLiquidity`, `beforeSwap`, `afterSwap`, `beforeSwapReturnDelta`, `afterSwapReturnDelta`
 - `_beforeSwap(...)`: override to integrate discounting; compute `effectiveFee` and use it everywhere the dynamic fee is used in `Spot`
 - Do not override `_afterSwap(...)` or `_afterInitialize(...)` (unless you need minor Brevis-specific checks); rely on `Spot` behavior
 - Preserve all Brevis admin and callback functions and `init(...)`
@@ -173,7 +174,7 @@ Security: `onlyPoolManager` restricts Uniswap callbacks, `onlyBrevisRequest` res
 
 ### Deployment scripts
 
-- Update permission bits to `0xCC2`
+- Update permission bits to `0x1ACC`
 - Deploy implementation with AEGIS addresses in the constructor
 - Deploy proxy via CREATE2 to match the permission suffix
 - Immediately call `init(owner, initialVk)` on the proxy
