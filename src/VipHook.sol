@@ -58,6 +58,11 @@ contract VipHook is VipDiscountMap, BrevisApp, Ownable, Spot {
         initOwner(owner);
         _setBrevisRequest(_brevisRequest);
         vkmap[_vkHash] = true;
+        
+        if (liquidityManager.authorizedHookAddress() != address(this)) {
+            revert Errors.InvalidHookAuthorization(liquidityManager.authorizedHookAddress(), address(this));
+        }
+        
     }
 
     // - - - Hook overrides to apply VIP discounts - - -
