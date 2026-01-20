@@ -87,6 +87,8 @@ contract Deploy is Script {
         address deployer = msg.sender;
         address owner = cfg.owner == address(0) ? deployer : cfg.owner;
         uint256 nonce = vm.getNonce(deployer);
+        console.log("Deployer address :", deployer);
+        console.log("Deployer nonce   :", nonce);
 
         address policyManagerAddress = vm.computeCreateAddress(deployer, nonce);
         address oracleAddress = vm.computeCreateAddress(deployer, nonce + 1);

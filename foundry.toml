@@ -23,6 +23,9 @@ fs_permissions = [
     { access = "read", path = "./script/config" },
     { access = "read-write", path = "./script/deploys/" }
 ]
+# default sender will break nonce compute
+sender = '0xe03b4133fff5d4023ec125c11167e1ba8d7419de'
+tx_origin = '0xe03b4133fff5d4023ec125c11167e1ba8d7419de'
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
 [etherscan]
