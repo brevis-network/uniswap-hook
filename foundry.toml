@@ -21,6 +21,7 @@ remappings = [
 
 fs_permissions = [
     { access = "read", path = "./script/config" },
+    { access = "read-write", path = "./script/deploys/" }
 ]
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options

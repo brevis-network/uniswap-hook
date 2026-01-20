@@ -19,7 +19,7 @@ import {TransparentUpgradeableProxy} from "openzeppelin-contracts/contracts/prox
 
 contract Deploy is Script {
     address constant CREATE2_FACTORY_ADDR = 0x4e59b44847b379578588920cA78FbF26c0B4956C;
-    string public deployConfigPath = string.concat("script/config/sepolia.json");
+    string public deployConfigPath = string.concat("script/config/xlayer.json");
 
     struct HookDeployConfig {
         address poolManager;
@@ -68,6 +68,19 @@ contract Deploy is Script {
         console.log("VipHook implementation :", deployed.vipHook);
         console.log("VipHook proxy          :", deployed.proxy);
         console.log("Proxy salt             :", vm.toString(deployed.salt));
+
+        // save to json for go code easy parsing
+        string memory jsonRoot = "root";
+        vm.serializeAddress(jsonRoot, "poolPolicyManager", deployed.policyManager);
+        vm.serializeAddress(jsonRoot, "truncGeoOracleMulti", deployed.oracle);
+        vm.serializeAddress(jsonRoot, "dynamicFeeManager", deployed.feeManager);
+        vm.serializeAddress(jsonRoot, "fullRangeLiquidityManager", deployed.liquidityManager);
+        vm.serializeAddress(jsonRoot, "vipHookImplementation", deployed.vipHook);
+        vm.serializeAddress(jsonRoot, "vipHookProxy", deployed.proxy);
+        string memory finalJson = vm.serializeBytes32(jsonRoot, "vipHookProxySalt", deployed.salt);
+        string memory outputPath = string.concat("script/deploys/", vm.envString("REQUEST_ID"), ".json");
+        vm.writeJson(finalJson, outputPath);
+        console.log("Deployments saved to", outputPath);
     }
 
     function _deploy(HookDeployConfig memory cfg) internal returns (DeploymentResult memory deployed) {
