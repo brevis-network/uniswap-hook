@@ -26,6 +26,7 @@ contract Deploy is Script {
         address positionManager;
         address brevisRequest;
         address owner;
+        address proxyAdmin;
         uint256 dailyBudget;
         bytes32 initialVkHash;
     }
@@ -47,6 +48,7 @@ contract Deploy is Script {
         cfg.positionManager = vm.parseJsonAddress(raw, ".positionManager");
         cfg.brevisRequest = vm.parseJsonAddress(raw, ".brevisRequest");
         cfg.owner = vm.parseJsonAddress(raw, ".owner");
+        cfg.proxyAdmin = vm.parseJsonAddress(raw, ".proxyAdmin");
         cfg.dailyBudget = vm.parseJsonUint(raw, ".dailyBudget");
         cfg.initialVkHash = vm.parseJsonBytes32(raw, ".initialVkHash");
 
@@ -124,7 +126,7 @@ contract Deploy is Script {
             CREATE2_FACTORY_ADDR,
             flags,
             type(TransparentUpgradeableProxy).creationCode,
-            abi.encode(vipHookLogicAddress, deployer, initData)
+            abi.encode(vipHookLogicAddress, cfg.proxyAdmin, initData)
         );
 
         console.log("Mined VipHook proxy    :", proxyAddress);
@@ -165,7 +167,7 @@ contract Deploy is Script {
         console.log("VipHook deployed");
 
         TransparentUpgradeableProxy proxy =
-            new TransparentUpgradeableProxy{salt: proxySalt}(address(hook), deployer, initData);
+            new TransparentUpgradeableProxy{salt: proxySalt}(address(hook), cfg.proxyAdmin, initData);
         require(address(proxy) == proxyAddress, "Proxy address mismatch");
         console.log("Transparent proxy deployed");
 

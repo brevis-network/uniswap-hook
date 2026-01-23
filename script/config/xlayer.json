@@ -3,6 +3,7 @@
     "positionManager": "0xbc9f3a5d767dd46e040f1ca48ab17f29f59dc806",
     "brevisRequest": "0x9D3d4c9876Ce85fcaDb4aa835C249DcaF4D56999",
     "owner": "0xe03b4133fff5d4023ec125c11167e1ba8d7419de",
+    "proxyAdmin": "0x0fb3945b994776d3bb4b2774cd720b0cc38e88f6",
     "dailyBudget": 0,
     "initialVkHash": "0x0000000000000000000000000000000000000000000000000000000000000000"
 }
